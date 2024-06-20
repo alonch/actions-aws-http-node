@@ -1,0 +1,18 @@
+;; shadow-cljs configuration
+{:source-paths
+ ["src/dev"
+  "src/main"
+  "src/test"]
+
+ :dependencies
+ [[metosin/reitit "0.7.0"]
+  [org.clojure/data.json "2.5.0"]
+  [camel-snake-kebab "0.4.3"]]
+
+ :builds
+  {:app
+   {:target :node-library
+    :output-to "dist/router.js"
+    :devtools {
+               :reload-strategy :full}
+    :exports {:handler router/handler}}}} 

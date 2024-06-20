@@ -1,0 +1,1 @@
+{"version":3,"sources":["router.cljs"],"mappings":";;;AAEA,iBAAA,jBAAMA;AAAN,AACE,gHAAA,zGAACC;;AAEH","names":["router/handler","cljs.core.println"],"sourcesContent":["(ns router)\n\n(defn handler []\n  (println \"Hello World 6\"))\n\n(comment (handler))"]}
