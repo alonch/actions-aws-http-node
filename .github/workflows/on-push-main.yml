@@ -26,8 +26,8 @@ jobs:
       - uses: alonch/actions-aws-http-node@main
         with: 
           name: actions-aws-http-node
-          artifacts: src
-          entrypoint-file: index.js
+          artifacts: dist
+          entrypoint-file: entry.js
           entrypoint-function: handler
           allow-public-access: true
 
