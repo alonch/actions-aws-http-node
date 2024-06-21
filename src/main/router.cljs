@@ -152,7 +152,7 @@
    [:body {:default ""} [:map {:decode/json parse-str-json-or-default}]]
    [:headers [:map
               [:cookie {:optional true} [:map {:decode/json cookies-str->clj}]]]]
-   [:query-string-parameters :any]
+   [:query-string-parameters {:default {}} :any]
    [:request-context [:map
                       [:http [:map
                               [:method [:keyword {:decode/string clojure.string/lower-case}]]
