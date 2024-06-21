@@ -1,7 +1,7 @@
 {
     "version": "2.0",
     "routeKey": "$default",
-    "rawPath": "/plus/10",
+    "rawPath": "/plus/",
     "rawQueryString": "x=2",
     "cookies": [
         "TOKEN=ABC",
@@ -12,7 +12,7 @@
         "content-length": "35",
         "x-amzn-tls-version": "TLSv1.3",
         "x-amzn-trace-id": "Root=1-6672f4fe-755ec8f5392ac2cd05bf2e7a",
-        "cookie": "TOKEN=ABC; SECRET=123",
+        "cookie": "TOKEN=ABC; t=123",
         "x-forwarded-proto": "https",
         "host": "trflk2cbahj2iajcaljxevhvpq0gxzce.lambda-url.us-east-1.on.aws",
         "x-forwarded-port": "443",

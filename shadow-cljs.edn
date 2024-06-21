@@ -12,6 +12,7 @@
  :builds
   {:app
    {:target :node-library
+    :module-loader true
     :output-to "dist/router.js"
     :devtools {
                :reload-strategy :full}

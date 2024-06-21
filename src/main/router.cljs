@@ -10,14 +10,15 @@
             [reitit.dev.pretty :as pretty]
             [reitit.coercion.malli :as rcm]
             [reitit.coercion :as rc]
-               ;       [reitit.ring.middleware.dev :as dev]
-            [reitit.ring.spec :as spec]
+            [reitit.ring.spec :as rrs]
             [camel-snake-kebab.core :as csk]
                ;       [spec-tools.spell :as spell]
             [malli.util :as mu]
             [malli.error :as me]
             [clojure.string :as str]
-            [malli.transform :as mt]))
+            [malli.transform :as mt]
+            ["import-modules" :as import-modules]
+            [reitit.spec :as rs]))
 
 (def app-header
   (ring/ring-handler
@@ -27,7 +28,8 @@
                 {:data {:coercion rcm/coercion
                         :middleware [coercion/coerce-exceptions-middleware
                                      coercion/coerce-request-middleware
-                                     coercion/coerce-response-middleware]}})))
+                                     coercion/coerce-response-middleware]}})
+   (constantly {:status 404, :body ""})))
 (comment
 
   (app-header {:uri "/test"
@@ -39,7 +41,6 @@
   (ring/ring-handler
    (ring/router ["/plus/{z}"
                  {:post {:summary "plus with malli query parameters"
-
                          :parameters {:path [:map
                                              [:z int?]]
                                       :query [:map
@@ -52,25 +53,25 @@
                                              [:y int?]]
                                       :header [:map
                                                [:cookie
-                                                [:map 
-                                                 [:TOKEN :string]
-                                                 [:SECRET :int]]]]}
+                                                [:map
+                                                 [:t :int]]]]}
                          :responses {200 {:body [:map [:total int?]]}}
                          :handler (fn [data]
                                     (let [{:keys [parameters header-params]} data
                                           {{:keys [x]} :query
                                            {:keys [y]} :body
                                            {:keys [z]} :path
-                                           {{:keys [TOKEN SECRET]} :cookie} :header} parameters]
+                                           {{:keys [TOKEN t]} :cookie} :header} parameters]
                                       (println "==")
-                                      (println TOKEN SECRET)
-                                      (println "==")
+                                      (js/console.log (clj->js parameters))
+
                                       {:status 200
-                                       :body {:total (+ x y z SECRET)}}))}}]
+                                       :body {:total (+ x y z t)}}))}}]
                 {:data {:coercion rcm/coercion
                         :middleware [coercion/coerce-exceptions-middleware
                                      coercion/coerce-request-middleware
-                                     coercion/coerce-response-middleware]}})))
+                                     coercion/coerce-response-middleware]}})
+   (constantly {:status 404, :body ""})))
 
 
 (comment
@@ -81,12 +82,13 @@
 
 (def strict-json-transformer
   (mt/transformer
+   mt/default-value-transformer
    mt/string-transformer
    (mt/key-transformer {:decode csk/->kebab-case-keyword})
    mt/strip-extra-keys-transformer
    mt/json-transformer))
 
-(defn cookies-str->clj 
+(defn cookies-str->clj
   [cookie-str]
   (->> (str/split cookie-str #"; ")
        (map #(str/split % #"="))
@@ -100,13 +102,18 @@
       (js/JSON.parse)
       (js->clj :keywordize-keys true)))
 
+(defn parse-str-json-or-default [data]
+  (cond
+    (empty? data) {}
+    :else (str-json->clj data)))
+
 (defn read-json [path]
   (-> (.readFileSync fs path {"encoding" 'utf8' "flag" 'r'})
       (str-json->clj)))
 
 (def Event
   [:map
-   [:body [:map {:decode/json str-json->clj}]]
+   [:body [:map {:decode/json parse-str-json-or-default}]]
    [:headers [:map
               [:cookie [:map {:decode/json cookies-str->clj}]]]]
    [:query-string-parameters :any]
@@ -144,18 +151,45 @@
                  :headers headers}
         response ((app) request)]
     (println path query-string-parameters body headers method)
-    (println response)))
+    (println response)
+    (println (get-in response [:body :humanized]))
+    response))
 
 
 (comment
   (handler "./event.json"))
 
+(defn fn-to-call-on-load []
+  (println "plus loaded"))
+
+(def plus (str (js/process.cwd) "/plus.mjs"))
+
+(comment
+  (do (require '["./modules/plus.js" :as plus] :reload)
+      (print plus))
+  
+  (js/console.log (->
+                   (.readFileSync fs "plus.js" {"encoding" 'utf8' "flag" 'r'})
+                   (str)
+                   (js/eval) 
+                   (.handler )))
+  (js/shadow.js.jsRequire "./modules/plus")
+  (str js/__filename)
+  (js/process.cwd)
+  (-> (import-modules "modules")
+      (js->clj :keywordize-keys true)
+      (:plus)
+      (:handler)
+      (apply "hello")
+      (.then print)))
 (defn ^:dev/before-load stop [])
   ;; (println "============= stop =================")
 
 (defn ^:dev/after-load start []
   (println "============= restart =================")
-  (handler "./event.json"))
+  (handler "./event.json")
+  ;; (require '[ :as plus] :reload)
+  )
 
   ;; (js/console.log (read-json "./event.json"))
   
