@@ -30,4 +30,5 @@ jobs:
           entrypoint-file: entry.js
           entrypoint-function: handler
           allow-public-access: true
+          timeout: 60
 
