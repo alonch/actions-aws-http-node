@@ -151,7 +151,7 @@
   [:map
    [:body [:map {:decode/json parse-str-json-or-default}]]
    [:headers [:map
-              [:cookie [:map {:decode/json cookies-str->clj}]]]]
+              [:cookie {:optional true} [:map {:decode/json cookies-str->clj}]]]]
    [:query-string-parameters :any]
    [:request-context [:map
                       [:http [:map

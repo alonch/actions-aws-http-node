@@ -1,13 +1,18 @@
 {
     "version": "2.0",
     "routeKey": "$default",
-    "rawPath": "/api-docs/index.html",
+    "rawPath": "/plus/",
     "rawQueryString": "x=2",
+    "cookies": [
+        "TOKEN=ABC",
+        "SECRET=123"
+    ],
     "headers": {
         "x-amzn-tls-cipher-suite": "TLS_AES_128_GCM_SHA256",
         "content-length": "35",
         "x-amzn-tls-version": "TLSv1.3",
         "x-amzn-trace-id": "Root=1-6672f4fe-755ec8f5392ac2cd05bf2e7a",
+        "cookie": "TOKEN=ABC; t=123",
         "x-forwarded-proto": "https",
         "host": "trflk2cbahj2iajcaljxevhvpq0gxzce.lambda-url.us-east-1.on.aws",
         "x-forwarded-port": "443",
@@ -25,8 +30,8 @@
         "domainName": "trflk2cbahj2iajcaljxevhvpq0gxzce.lambda-url.us-east-1.on.aws",
         "domainPrefix": "trflk2cbahj2iajcaljxevhvpq0gxzce",
         "http": {
-            "method": "GET",
-            "path": "/api-docs/index.html",
+            "method": "POST",
+            "path": "/plus/10",
             "protocol": "HTTP/1.1",
             "sourceIp": "207.60.80.239",
             "userAgent": "curl/8.4.0"
@@ -37,6 +42,6 @@
         "time": "19/Jun/2024:15:10:54 +0000",
         "timeEpoch": 1718809854291
     },
-    "body": "",
+    "body": "{\"y\":4}",
     "isBase64Encoded": false
 }
