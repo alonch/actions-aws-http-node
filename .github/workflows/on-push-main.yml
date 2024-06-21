@@ -23,7 +23,7 @@ jobs:
       - uses: alonch/actions-aws-backend-setup@main
         with: 
           instance: sample
-      - uses: alonch/actions-aws-http-node@main
+      - uses: alonch/actions-aws-function-node@main
         with: 
           name: actions-aws-http-node
           artifacts: dist
