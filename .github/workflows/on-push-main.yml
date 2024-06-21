@@ -23,6 +23,11 @@ jobs:
       - uses: alonch/actions-aws-backend-setup@main
         with: 
           instance: sample
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - run: mv node_modules ./dist/
       - uses: alonch/actions-aws-function-node@main
         with: 
           name: actions-aws-http-node
