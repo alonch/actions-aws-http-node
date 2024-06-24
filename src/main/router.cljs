@@ -149,7 +149,7 @@
 
 (def Event
   [:map
-   [:body {:default ""} [:map {:decode/json parse-str-json-or-default}]]
+   [:body [:map {:decode/json parse-str-json-or-default}]]
    [:headers [:map
               [:cookie {:optional true} [:map {:decode/json cookies-str->clj}]]]]
    [:query-string-parameters {:default {}} :any]
@@ -165,6 +165,7 @@
   (try
     (-> event
         (js->clj)
+        (merge {:body ""})
         (#(m/coerce Event % strict-json-transformer)))
     (catch js/Error e
       (-> e ex-data :data :explain me/humanize))))
@@ -208,7 +209,7 @@
 
 (defn ^:dev/after-load start []
   (println "============= restart =================")
-  (-> (handler "./event.json" (read-json->js "./event.json"))
+  (-> (handler "./event.json"  (read-json->js "./event.json"))
       (js/console.log))
   ;; (require '[ :as plus] :reload)
   )
