@@ -159,13 +159,18 @@
                               [:path :string]]]]]])
 
 
+(defn inject-default-body [event]
+  (let[body (get event "body")]
+   (print event)
+   (assoc event body (or body ""))))
+
 (def event (read-json->js "./event.json"))
 
 (defn coerce-event [event]
   (try
     (-> event
         (js->clj)
-        (merge {:body ""})
+        (inject-default-body)
         (#(m/coerce Event % strict-json-transformer)))
     (catch js/Error e
       (-> e ex-data :data :explain me/humanize))))
@@ -209,7 +214,7 @@
 
 (defn ^:dev/after-load start []
   (println "============= restart =================")
-  (-> (handler "./event.json"  (read-json->js "./event.json"))
+  (-> (handler "./event.json"  (read-json->js "./event-plus.json"))
       (js/console.log))
   ;; (require '[ :as plus] :reload)
   )
