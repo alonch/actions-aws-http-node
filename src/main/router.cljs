@@ -95,7 +95,6 @@
                                             {:keys [y]} :body
                                             {:keys [z]} :path
                                             {{:keys [TOKEN t]} :cookie} :header} parameters]
-                                       (println "==")
                                        (js/console.log (clj->js parameters))
 
                                        {:status 200
@@ -149,7 +148,8 @@
 
 (def Event
   [:map
-   [:body [:map {:decode/json parse-str-json-or-default}]]
+   [:body [:default-fn #(print %)
+           :map {:decode/json parse-str-json-or-default}]]
    [:headers [:map
               [:cookie {:optional true} [:map {:decode/json cookies-str->clj}]]]]
    [:query-string-parameters {:default {}} :any]
@@ -161,7 +161,6 @@
 
 (defn inject-default-body [event]
   (let[body (get event "body")]
-   (print event)
    (assoc event body (or body ""))))
 
 (def event (read-json->js "./event.json"))
@@ -187,11 +186,7 @@
                  :request-method method
                  :body-params body
                  :headers headers}
-        response (app request)]
-    (js/console.log js-event)
-    (println path query-string-parameters body headers method)
-    (println response)
-
+        response (app request)] 
     (-> response
         (assoc :statusCode (:status response))
         (dissoc :status)
