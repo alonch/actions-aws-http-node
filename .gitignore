@@ -34,3 +34,7 @@ pom.xml.asc
 .hgignore
 .hg/
 .calva
+
+out/
+dist/module.js
+dist/router.js

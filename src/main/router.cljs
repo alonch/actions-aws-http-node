@@ -1,6 +1,5 @@
 (ns router
-  (:require ["fs" :as fs]
-            [reitit.ring :as ring]
+  (:require [reitit.ring :as ring]
           ;;  [reitit.openapi :as openapi]
             [reitit.ring.malli]
             [malli.core :as m]
@@ -17,7 +16,9 @@
             ["swagger-ui-dist" :as swagger-ui]
             [clojure.string :as str]
             [malli.transform :as mt]
-            [reitit.spec :as rs]))
+            [reitit.spec :as rs]
+            [utils]
+            [parser]))
 
 (def app-header
   (ring/ring-handler
@@ -64,8 +65,7 @@
                    {:get {:handler
                           (fn [{{:keys [path]} :path-params}]
                             (let [file (str swagger-path "/" path)
-                                  content (-> (.readFileSync fs file {"encoding" 'utf8' "flag" 'r'})
-                                              (str))
+                                  content (utils/read-static-content file)
                                   parsed-content (cond
                                                    (= path "swagger-initializer.js") (remove-petstore-url content)
                                                    :else content)]
@@ -83,22 +83,17 @@
                                                  :json-schema/default 42}
                                                 int?]]
                                        :body [:map
-                                              [:y int?]]
-                                       :header [:map
-                                                [:cookie
-                                                 [:map
-                                                  [:t :int]]]]}
+                                              [:y int?]]}
                           :responses {200 {:body [:map [:total int?]]}}
                           :handler (fn [data]
                                      (let [{:keys [parameters header-params]} data
                                            {{:keys [x]} :query
                                             {:keys [y]} :body
-                                            {:keys [z]} :path
-                                            {{:keys [TOKEN t]} :cookie} :header} parameters]
+                                            {:keys [z]} :path} parameters]
                                        (js/console.log (clj->js parameters))
 
                                        {:status 200
-                                        :body {:total (+ x y z t)}}))}}]]
+                                        :body {:total (+ x y z)}}))}}]]
                 {:data {:coercion rcm/coercion
                         :middleware [coercion/coerce-exceptions-middleware
                                      coercion/coerce-request-middleware
@@ -128,28 +123,9 @@
 
 (comment (cookies-str->clj "TOKEN=123; SECRET=432"))
 
-(defn str-json->clj [data]
-  (-> data
-      (js/JSON.parse)
-      (js->clj :keywordize-keys true)))
-
-(defn parse-str-json-or-default [data]
-  (cond
-    (empty? data) {}
-    :else (str-json->clj data)))
-
-(defn read-json->clj [path]
-  (-> (.readFileSync fs path {"encoding" 'utf8' "flag" 'r'})
-      (str-json->clj)))
-
-(defn read-json->js [path]
-  (-> (.readFileSync fs path {"encoding" 'utf8' "flag" 'r'})
-      (js/JSON.parse)))
-
 (def Event
   [:map
-   [:body [:default-fn #(print %)
-           :map {:decode/json parse-str-json-or-default}]]
+   [:body [:map {:decode/json utils/parse-str-json-or-default}]]
    [:headers [:map
               [:cookie {:optional true} [:map {:decode/json cookies-str->clj}]]]]
    [:query-string-parameters {:default {}} :any]
@@ -163,7 +139,7 @@
   (let[body (get event "body")]
    (assoc event body (or body ""))))
 
-(def event (read-json->js "./event.json"))
+(def event (utils/read-json->js "./event.json"))
 
 (defn coerce-event [event]
   (try
@@ -175,7 +151,7 @@
       (-> e ex-data :data :explain me/humanize))))
 
 (defn handler [path-routes, js-event]
-  (let [routes-json (read-json->clj path-routes)
+  (let [routes-json (parser/parse-json-file path-routes)
         ;; event (read-event "./event.json")
         event (coerce-event js-event)
         {:keys [body query-string-parameters headers request-context]} event
@@ -204,12 +180,13 @@
       (get "handler")
       (apply "hola")
       (.then js/console.log)))
-(defn ^:dev/before-load stop [])
-  ;; (println "============= stop =================")
+
+;; (defn ^:dev/before-load stop [])
+;;   ;; (println "============= stop =================")
 
 (defn ^:dev/after-load start []
   (println "============= restart =================")
-  (-> (handler "./event.json"  (read-json->js "./event-plus.json"))
+  (-> (handler "./event.json"  (utils/read-json->js "./event-plus.json"))
       (js/console.log))
   ;; (require '[ :as plus] :reload)
   )

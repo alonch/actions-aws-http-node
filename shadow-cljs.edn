@@ -10,10 +10,14 @@
   [camel-snake-kebab "0.4.3"]]
 
  :builds
-  {:app
+  {:test
+     {:target    :node-test
+      :output-to "out/node-tests.js"
+      :autorun   true}
+   :app
    {:target :node-library
-    :module-loader true
-    :output-to "dist/router.js"
+    :output-to "dist/module.js"
     :devtools {
                :reload-strategy :full}
-    :exports {:handler router/handler}}}} 
+    :exports {:handler router/handler
+              :parseFile parser/parse-json-file}}}}

@@ -1,0 +1,41 @@
+{
+  "routes": [
+    {
+      "entrypoint-file": "src/index.js",
+      "entrypoint-function": "handler",
+      "path": "/plus/{z}",
+      "method": "post",
+      "parameters": {
+        "path": [
+          {
+            "name": "z",
+            "type": "number"
+          }
+        ],
+        "query": [
+          {
+            "name": "x",
+            "type": "number"
+          }
+        ],
+        "body": [
+          {
+            "name": "y",
+            "type": "number"
+          }
+        ]
+      },
+      "responses": [
+        {
+          "status-code": 200,
+          "body": [
+            {
+              "name": "total",
+              "type": "number"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
