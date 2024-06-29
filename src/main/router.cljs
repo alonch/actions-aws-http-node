@@ -121,7 +121,6 @@
 (def event (utils/read-json->js "./event.json"))
 
 (defn coerce-event [event]
-  (println event)
   (try
     (-> event
         (js->clj)
