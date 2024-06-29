@@ -71,7 +71,7 @@
 
 (defn ^:dev/after-load start []
   (println "============= restart =================")
-  (-> (parse-json-file "../routes.json")
+  (-> (parse-yaml-file "../routes.yaml")
       (println))
   ;; (require '[ :as plus] :reload)
   )

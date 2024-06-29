@@ -116,17 +116,19 @@
 
 (defn inject-default-body [event]
   (let [body (get event "body")]
-    (assoc event body (or body ""))))
+    (assoc event "body" (or body ""))))
 
 (def event (utils/read-json->js "./event.json"))
 
 (defn coerce-event [event]
+  (println event)
   (try
     (-> event
         (js->clj)
         (inject-default-body)
         (#(m/coerce Event % strict-json-transformer)))
     (catch js/Error e
+      (js/console.error e)
       (-> e ex-data :data :explain me/humanize))))
 
 (defn handler [path-routes, js-event on-result]
@@ -145,17 +147,20 @@
                  :query-params query-string-parameters
                  :request-method method
                  :body-params body
-                 :headers headers}
-        response ((app routes-details) request
-                                       callback
-                                       callback)]
-    ))
+                 :headers headers}]
+    (println request)
+    ((app routes-details) request
+                          callback
+                          callback)))
 
 ;; (comment
-;;   (handler "./event.json" {})
-;;   ((app) {:request-method :get :uri "/swagger.json"})
-;;   ((app) {:request-method :get :uri "/api-docs/swagger-initializer.js"})
-;;   ((app) {:request-method :get :uri "/nothing"}))
+  
+;;   ((app (parser/parse-yaml-file "../routes.yaml")) 
+;;    {:request-method :get :uri "/swagger.json"})
+;;   ((app (parser/parse-yaml-file "../routes.yaml")) 
+;;    {:request-method :get :uri "/api-docs/index.html"})
+;;   ((app (parser/parse-yaml-file "../routes.yaml")) 
+;;    {:request-method :get :uri "/nothing"}))
 
 (comment
   (-> (js/require "./plus.js")
@@ -170,7 +175,7 @@
 (defn ^:dev/after-load start []
   (println "============= restart =================")
   (-> (handler "../routes.yaml"
-               (utils/read-json->js "./event-plus.json")
+               (utils/read-json->js "./event.json")
                (fn [result]
                  (js/console.log result))))
   ;; (require '[ :as plus] :reload)
