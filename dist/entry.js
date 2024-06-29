@@ -1,9 +1,10 @@
 const router = require("./actions-aws-http-node.js")
 
-exports.handler = function (event, context, callback) {
+exports.handler = async function (event, context, callback) {
     console.log(JSON.stringify(event))
-    return new Promise((resolve, reject) => {
-        console.log(JSON.stringify(response))
+    const response = await new Promise((resolve, reject) => {
         router.handler("./event.json", event, resolve)
     });
+    console.log(JSON.stringify(response))
+    return response
 };
