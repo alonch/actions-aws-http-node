@@ -149,8 +149,6 @@
         response ((app routes-details) request
                                        callback
                                        callback)]
-    (println "=================")
-    (println response)
     ))
 
 ;; (comment

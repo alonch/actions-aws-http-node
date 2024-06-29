@@ -1,4 +1,9 @@
 routes:
+  - entrypoint-file: src/index
+    entrypoint-function: handler
+    path: "/"
+    method: get
+    
   - entrypoint-file: src/plus
     entrypoint-function: handler
     path: "/plus/{z}"
