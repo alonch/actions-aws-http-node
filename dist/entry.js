@@ -1,5 +1,6 @@
 const router = require("./router.js")
 
-exports.handler = async function (event, context) {
-    return router.handler("./event.json", event)
+exports.handler = function (event, context, callback) {
+    const wrapper = (response) => { callback(null, response) }
+    router.handler("./event.json", event, wrapper)
 };

@@ -1,10 +1,12 @@
 (ns parser
-  (:require [utils]))
+  (:require [clojure.core.async :refer [chan put! take!]]
+            [promesa.core :as p]
+            [utils]))
 
 (defn type->schema [type]
   (cond
-    (= type "number") int?
-    :else any?))
+    (= type "number") :int
+    :else :any))
 
 (defn parse-schema [body]
   (let [var-name (-> body (:name) keyword)
@@ -13,22 +15,30 @@
 
 (defn parse-response [response]
   (let [attributes (map parse-schema (:body response))]
-    {(:status-code response) {:body (concat [:map] attributes)}}))
+    {(:status-code response) {:body (->> attributes
+                                         (concat [:map])
+                                         (into []))}}))
 
 (defn parse-parameter-schema [route parameter-key]
   (let [attributes (->> route
                         (:parameters)
                         (parameter-key)
                         (map parse-schema))]
-    (concat [:map] attributes)))
+    (->> attributes (concat [:map]) (into []))))
+
+
 
 (defn parse-handler [route]
-  (fn [{:keys [parameters]}]
-    (let [js-params (clj->js parameters)]
-      (-> (js/require (:entrypoint-file route))
-          (js->clj)
-          (get (:entrypoint-function route))
-          (apply js-params)))));;TODO returning a Promise, would it work? 
+  (fn [{:keys [parameters]} resolve reject]
+    (-> (js/require (str "./" (:entrypoint-file route)))
+        (js->clj)
+        (get (:entrypoint-function route))
+        (apply [(clj->js parameters)])
+        (.then (fn [result]
+                 (try 
+                   (resolve (js->clj result :keywordize-keys true))
+                   (catch js/Error e
+                     (reject e))))))))
 
 (defn parse-route [route]
   (let [path (:path route)
@@ -41,10 +51,20 @@
                            :path (parse-parameter-schema route :path)
                            :body (parse-parameter-schema route :body)}}}]))
 
+(defn parse [content]
+  (let [raw-routes (:routes content)]
+    (->> raw-routes
+         (map parse-route)
+         (into []))))
+
 (defn parse-json-file [path]
-  (let [content (utils/read-json->clj path)
-        raw-routes (:routes content)]
-    (map parse-route raw-routes)))
+  (parse (utils/read-json->clj path)))
+
+(defn parse-yaml-file [path]
+  (parse (utils/read-yaml->clj path)))
+
+
+
 
 (defn ^:dev/before-load stop [])
   ;; (println "============= stop =================")

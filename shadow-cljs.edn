@@ -7,7 +7,8 @@
  :dependencies
  [[metosin/reitit "0.7.0"]
   [org.clojure/data.json "2.5.0"]
-  [camel-snake-kebab "0.4.3"]]
+  [camel-snake-kebab "0.4.3"]
+  [funcool/promesa "11.0.678"]]
 
  :builds
   {:test
@@ -16,7 +17,7 @@
       :autorun   true}
    :app
    {:target :node-library
-    :output-to "dist/module.js"
+    :output-to "dist/actions-aws-http-node.js"
     :devtools {
                :reload-strategy :full}
     :exports {:handler router/handler

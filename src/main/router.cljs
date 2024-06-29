@@ -56,7 +56,7 @@
 (comment
   (remove-petstore-url ""))
 
-(def app
+(defn app [details]
   (ring/ring-handler
    (ring/router [["" {:no-doc true}
                   ["/swagger.json"
@@ -72,28 +72,7 @@
                               {:status 200
                                :body parsed-content
                                :headers {:content-type (get-content-type path)}}))}}]]
-                 ["/plus/{z}"
-                  {:post {:summary "plus with malli query parameters"
-                          :parameters {:path [:map
-                                              [:z int?]]
-                                       :query [:map
-                                               [:x
-                                                {:title "X parameter"
-                                                 :description "Description for X parameter"
-                                                 :json-schema/default 42}
-                                                int?]]
-                                       :body [:map
-                                              [:y int?]]}
-                          :responses {200 {:body [:map [:total int?]]}}
-                          :handler (fn [data]
-                                     (let [{:keys [parameters header-params]} data
-                                           {{:keys [x]} :query
-                                            {:keys [y]} :body
-                                            {:keys [z]} :path} parameters]
-                                       (js/console.log (clj->js parameters))
-
-                                       {:status 200
-                                        :body {:total (+ x y z)}}))}}]]
+                 details]
                 {:data {:coercion rcm/coercion
                         :middleware [coercion/coerce-exceptions-middleware
                                      coercion/coerce-request-middleware
@@ -101,11 +80,11 @@
    (ring/create-default-handler)))
 
 
-(comment
-  (try
-    (app)
-    (catch js/Error e
-      (-> e ex-data :data :explain me/humanize))))
+;; (comment
+;;   (try
+;;     (app)
+;;     (catch js/Error e
+;;       (-> e ex-data :data :explain me/humanize))))
 
 (def strict-json-transformer
   (mt/transformer
@@ -136,8 +115,8 @@
 
 
 (defn inject-default-body [event]
-  (let[body (get event "body")]
-   (assoc event body (or body ""))))
+  (let [body (get event "body")]
+    (assoc event body (or body ""))))
 
 (def event (utils/read-json->js "./event.json"))
 
@@ -150,9 +129,14 @@
     (catch js/Error e
       (-> e ex-data :data :explain me/humanize))))
 
-(defn handler [path-routes, js-event]
-  (let [routes-json (parser/parse-json-file path-routes)
-        ;; event (read-event "./event.json")
+(defn handler [path-routes, js-event on-result]
+  (let [callback (fn [result]
+                   (-> result
+                       (assoc :statusCode (:status result))
+                       (dissoc :status)
+                       (clj->js)
+                       (on-result)))
+        routes-details (parser/parse-yaml-file path-routes)
         event (coerce-event js-event)
         {:keys [body query-string-parameters headers request-context]} event
         {:keys [http]} request-context
@@ -162,17 +146,18 @@
                  :request-method method
                  :body-params body
                  :headers headers}
-        response (app request)] 
-    (-> response
-        (assoc :statusCode (:status response))
-        (dissoc :status)
-        (clj->js))))
+        response ((app routes-details) request
+                                       callback
+                                       callback)]
+    (println "=================")
+    (println response)
+    ))
 
-(comment
-  (handler "./event.json" {})
-  ((app) {:request-method :get :uri "/swagger.json"})
-  ((app) {:request-method :get :uri "/api-docs/swagger-initializer.js"})
-  ((app) {:request-method :get :uri "/nothing"}))
+;; (comment
+;;   (handler "./event.json" {})
+;;   ((app) {:request-method :get :uri "/swagger.json"})
+;;   ((app) {:request-method :get :uri "/api-docs/swagger-initializer.js"})
+;;   ((app) {:request-method :get :uri "/nothing"}))
 
 (comment
   (-> (js/require "./plus.js")
@@ -186,8 +171,10 @@
 
 (defn ^:dev/after-load start []
   (println "============= restart =================")
-  (-> (handler "./event.json"  (utils/read-json->js "./event-plus.json"))
-      (js/console.log))
+  (-> (handler "../routes.yaml"
+               (utils/read-json->js "./event-plus.json")
+               (fn [result]
+                 (js/console.log result))))
   ;; (require '[ :as plus] :reload)
   )
   

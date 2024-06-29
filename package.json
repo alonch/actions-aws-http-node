@@ -6,6 +6,7 @@
     "shadow-cljs": "^2.28.9"
   },
   "dependencies": {
-    "swagger-ui-dist": "^5.17.14"
+    "swagger-ui-dist": "^5.17.14",
+    "yaml": "^2.4.5"
   }
 }

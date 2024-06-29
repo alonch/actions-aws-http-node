@@ -1,5 +1,5 @@
 routes:
-  - entrypoint-file: src/index.js
+  - entrypoint-file: src/plus
     entrypoint-function: handler
     path: "/plus/{z}"
     method: post

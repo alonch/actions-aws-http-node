@@ -38,3 +38,4 @@ pom.xml.asc
 out/
 dist/module.js
 dist/router.js
+dist/actions-aws-http-node.js
