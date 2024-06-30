@@ -3,40 +3,43 @@
             [parser :as subject]))
 
 (def actual (subject/parse-yaml-file "routes.yaml"))
+(def advance-route (some #(when (= (first %) "/plus/{z}") %)
+                         actual))
+(def simple-route (some #(when (= (first %) "/") %)
+                         actual))
 
 (deftest parse-json-file-return-array
   (is (vector? actual)))
 
+(deftest find-advance-route
+  (is (= (first advance-route) "/plus/{z}")))
+
+(deftest find-simple-route
+  (is (= (first simple-route) "/")))
+
 (deftest parse-json-file-return-path
-  (let [path (-> actual
-                 (first)
-                 (first))]
+  (let [path (first advance-route)]
     (is (= path "/plus/{z}"))))
 
 (deftest parse-json-file-return-method
-  (let [method (-> actual
-                   (first)
-                   (second))]
-    (is (contains? method :post))))
+  (let [methods (second advance-route)]
+    (is (contains? methods :post))))
 
 (deftest parse-json-file-return-response-exist
-  (let [details (-> actual
-                    (first)
+  (let [details (-> advance-route
                     (second)
                     (:post))]
     (is (contains? details :responses))))
 
 (deftest parse-json-file-return-response-status-code
-  (let [responses (-> actual
-                      (first)
+  (let [responses (-> advance-route
                       (second)
                       (:post)
                       (:responses))]
     (is (contains? responses 200))))
 
 (deftest parse-json-file-return-response-body
-  (let [body (-> actual
-                 (first)
+  (let [body (-> advance-route
                  (second)
                  (:post)
                  (:responses)
@@ -44,8 +47,7 @@
     (is (contains? body :body))))
 
 (deftest parse-json-file-return-response-body-schema
-  (let [schema (-> actual
-                   (first)
+  (let [schema (-> advance-route
                    (second)
                    (:post)
                    (:responses)
@@ -55,23 +57,20 @@
                    [:total :int]]))))
 
 (deftest parse-json-file-return-response-parameteres
-  (let [details (-> actual
-                    (first)
+  (let [details (-> advance-route
                     (second)
                     (:post))]
     (is (contains? details :parameters))))
 
 (deftest parse-json-file-return-response-parameteres-body
-  (let [parameters (-> actual
-                       (first)
+  (let [parameters (-> advance-route
                        (second)
                        (:post)
                        (:parameters))]
     (is (contains? parameters :body))))
 
 (deftest parse-json-file-return-response-parameteres-body-schema
-  (let [body (-> actual
-                 (first)
+  (let [body (-> advance-route
                  (second)
                  (:post)
                  (:parameters)
@@ -80,16 +79,14 @@
                  [:y :int]]))))
 
 (deftest parse-json-file-return-response-parameteres-path
-  (let [parameters (-> actual
-                       (first)
+  (let [parameters (-> advance-route
                        (second)
                        (:post)
                        (:parameters))]
     (is (contains? parameters :path))))
 
 (deftest parse-json-file-return-response-parameteres-path-schema
-  (let [path (-> actual
-                 (first)
+  (let [path (-> advance-route
                  (second)
                  (:post)
                  (:parameters)
@@ -98,22 +95,28 @@
                  [:z :int]]))))
 
 (deftest parse-json-file-return-response-parameteres-query
-  (let [parameters (-> actual
-                       (first)
+  (let [parameters (-> advance-route
                        (second)
                        (:post)
                        (:parameters))]
     (is (contains? parameters :query))))
 
 (deftest parse-json-file-return-response-parameteres-query-schema
-  (let [query (-> actual
-                  (first)
+  (let [query (-> advance-route
                   (second)
                   (:post)
                   (:parameters)
                   (:query))]
     (is (= query [:map
                   [:x :int]]))))
+
+(deftest parse-skip-missing-parameters-body
+  (let [parameters (-> simple-route
+                       (second)
+                       (:get)
+                       (:parameters))] 
+    (println parameters)
+    (is (not (contains? parameters :body)))))
 
 ;; (deftest parse-json-file-e2e-basic
 ;;   (let [actual (subject/parse-json-file "routes.json")

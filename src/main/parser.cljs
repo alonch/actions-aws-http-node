@@ -24,32 +24,39 @@
                         (:parameters)
                         (parameter-key)
                         (map parse-schema))]
-    (->> attributes (concat [:map]) (into []))))
 
-
+    (when (not-empty attributes)
+      (->> attributes (concat [:map]) (into [])))))
 
 (defn parse-handler [route]
   (fn [{:keys [parameters]} resolve reject]
-    (-> (js/require (str "./" (:entrypoint-file route)))
-        (js->clj)
-        (get (:entrypoint-function route))
-        (apply [(clj->js parameters)])
-        (.then (fn [result]
-                 (try 
-                   (resolve (js->clj result :keywordize-keys true))
-                   (catch js/Error e
-                     (reject e))))))))
+    (try
+      (-> (js/require (str "./" (:entrypoint-file route)))
+          (js->clj)
+          (get (:entrypoint-function route))
+          (apply [(clj->js parameters)])
+          (.then (fn [result]
+                   (try
+                    (resolve (js->clj result :keywordize-keys true))
+                     (catch js/Error e 
+                       (reject e))))))
+      (catch js/Error e
+        (reject e)))))
 
 (defn parse-route [route]
   (let [path (:path route)
         method (-> route (:method) (keyword))
-        responses (map parse-response (:responses route))]
+        responses (map parse-response (:responses route))
+        query-schema (parse-parameter-schema route :query)
+        path-schema (parse-parameter-schema route :path)
+        body-schema (parse-parameter-schema route :body)]
     [path
      {method {:handler (parse-handler route)
               :responses (into {} responses)
-              :parameters {:query (parse-parameter-schema route :query)
-                           :path (parse-parameter-schema route :path)
-                           :body (parse-parameter-schema route :body)}}}]))
+              :parameters (cond-> {}
+                            (not-empty query-schema) (assoc :query query-schema)
+                            (not-empty path-schema) (assoc :path path-schema)
+                            (not-empty body-schema) (assoc :body body-schema))}}]))
 
 (defn parse [content]
   (let [raw-routes (:routes content)]
