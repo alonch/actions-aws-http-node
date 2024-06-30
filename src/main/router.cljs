@@ -120,17 +120,18 @@
 
 (def event (utils/read-json->js "./event.json"))
 
-(defn coerce-event [event]
+(defn coerce-event [event on-error]
   (try
     (-> event
         (js->clj)
         (inject-default-body)
         (#(m/coerce Event % strict-json-transformer)))
     (catch js/Error e
+      (on-error e)
       (js/console.error e)
       (-> e ex-data :data :explain me/humanize))))
 
-(defn handler [path-routes, js-event on-result]
+(defn handler [path-routes, js-event on-result on-error]
   (let [callback (fn [result]
                    (-> result
                        (assoc :statusCode (:status result))
@@ -138,7 +139,7 @@
                        (clj->js)
                        (on-result)))
         routes-details (parser/parse-yaml-file path-routes)
-        event (coerce-event js-event)
+        event (coerce-event js-event on-error)
         {:keys [body query-string-parameters headers request-context]} event
         {:keys [http]} request-context
         {:keys [method path]} http
@@ -176,7 +177,8 @@
   (-> (handler "../routes.yaml"
                (utils/read-json->js "./event.json")
                (fn [result]
-                 (js/console.log result))))
+                 (js/console.log result))
+               println))
   ;; (require '[ :as plus] :reload)
   )
   
