@@ -28,6 +28,7 @@ jobs:
           node-version: 20
       - run: npm install
       - run: mv node_modules ./dist/
+      - run: mv routes.yaml ./dist/
       - run: npx shadow-cljs release app
       - uses: alonch/actions-aws-function-node@main
         id: backend
