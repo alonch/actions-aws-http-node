@@ -30,6 +30,7 @@ jobs:
       - run: mv node_modules ./dist/
       - run: npx shadow-cljs release app
       - uses: alonch/actions-aws-function-node@main
+        id: backend
         with: 
           name: actions-aws-http-node
           artifacts: dist
