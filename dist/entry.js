@@ -1,6 +1,6 @@
 const router = require("./actions-aws-http-node.js")
 
-exports.handler = async (event, context) => {
+export const handler = async (event, context) => {
     console.log(JSON.stringify(event))
     const response = await new Promise((resolve, reject) => {
         router.handler("./event.json", event, resolve)
