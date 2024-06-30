@@ -1,0 +1,47 @@
+{
+    "version": "2.0",
+    "routeKey": "$default",
+    "rawPath": "/plus/",
+    "rawQueryString": "x=2",
+    "cookies": [
+        "TOKEN=ABC",
+        "SECRET=123"
+    ],
+    "headers": {
+        "x-amzn-tls-cipher-suite": "TLS_AES_128_GCM_SHA256",
+        "content-length": "35",
+        "x-amzn-tls-version": "TLSv1.3",
+        "x-amzn-trace-id": "Root=1-6672f4fe-755ec8f5392ac2cd05bf2e7a",
+        "cookie": "TOKEN=ABC; t=123",
+        "x-forwarded-proto": "https",
+        "host": "trflk2cbahj2iajcaljxevhvpq0gxzce.lambda-url.us-east-1.on.aws",
+        "x-forwarded-port": "443",
+        "content-type": "application/json",
+        "x-forwarded-for": "207.60.80.239",
+        "accept": "*/*",
+        "user-agent": "curl/8.4.0"
+    },
+    "queryStringParameters": {
+        "x": "2"
+    },
+    "requestContext": {
+        "accountId": "anonymous",
+        "apiId": "trflk2cbahj2iajcaljxevhvpq0gxzce",
+        "domainName": "trflk2cbahj2iajcaljxevhvpq0gxzce.lambda-url.us-east-1.on.aws",
+        "domainPrefix": "trflk2cbahj2iajcaljxevhvpq0gxzce",
+        "http": {
+            "method": "GET",
+            "path": "/api-docs/index.html",
+            "protocol": "HTTP/1.1",
+            "sourceIp": "207.60.80.239",
+            "userAgent": "curl/8.4.0"
+        },
+        "requestId": "8273be07-8297-4c09-9ca2-83ba88ab49df",
+        "routeKey": "$default",
+        "stage": "$default",
+        "time": "19/Jun/2024:15:10:54 +0000",
+        "timeEpoch": 1718809854291
+    },
+    "body": "{\"y\":4}",
+    "isBase64Encoded": false
+}

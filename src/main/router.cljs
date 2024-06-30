@@ -63,15 +63,15 @@
                    {:get (swagger/create-swagger-handler)}]
                   ["/api-docs/{*path}"
                    {:get {:handler
-                          (fn [{{:keys [path]} :path-params}]
+                          (fn [{{:keys [path]} :path-params} resolve _reject]
                             (let [file (str swagger-path "/" path)
                                   content (utils/read-static-content file)
                                   parsed-content (cond
                                                    (= path "swagger-initializer.js") (remove-petstore-url content)
                                                    :else content)]
-                              {:status 200
-                               :body parsed-content
-                               :headers {:content-type (get-content-type path)}}))}}]]
+                              (resolve {:status 200
+                                          :body parsed-content
+                                          :headers {:content-type (get-content-type path)}})))}}]]
                  details]
                 {:data {:coercion rcm/coercion
                         :middleware [coercion/coerce-exceptions-middleware
@@ -154,7 +154,7 @@
                           callback)))
 
 ;; (comment
-  
+
 ;;   ((app (parser/parse-yaml-file "../routes.yaml")) 
 ;;    {:request-method :get :uri "/swagger.json"})
 ;;   ((app (parser/parse-yaml-file "../routes.yaml")) 
@@ -174,11 +174,11 @@
 
 (defn ^:dev/after-load start []
   (println "============= restart =================")
-  (-> (handler "../routes.yaml"
-               (utils/read-json->js "./event.json")
-               (fn [result]
-                 (js/console.log result))
-               println))
+  (handler "../routes.yaml"
+           (utils/read-json->js "./event-api-docs.json")
+           (fn [result]
+             (js/console.log result))
+           println)
   ;; (require '[ :as plus] :reload)
   )
   
