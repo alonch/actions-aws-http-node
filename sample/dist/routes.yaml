@@ -1,10 +1,10 @@
 routes:
-  - entrypoint-file: src/index
+  - entrypoint-file: index
     entrypoint-function: handler
     path: "/"
     method: get
     
-  - entrypoint-file: src/plus
+  - entrypoint-file: plus
     entrypoint-function: handler
     path: "/plus/{z}"
     method: post
