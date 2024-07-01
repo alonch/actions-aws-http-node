@@ -3,7 +3,7 @@ name: demo
 on:
   push:
     branches:
-      - main
+      - main-nothing
 jobs:
   deploy:
     environment:
