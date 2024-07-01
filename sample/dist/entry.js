@@ -1,4 +1,4 @@
-const router = require("./actions-aws-http-node.js")
+const router = require("aws-lambda-router-yaml")
 
 exports.handler = async function(event, context) {
     console.log(JSON.stringify(event))

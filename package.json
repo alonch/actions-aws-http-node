@@ -5,6 +5,7 @@
   "devDependencies": {
     "shadow-cljs": "^2.28.9"
   },
+  "main": "dist/actions-aws-http-node.js",
   "files": [
     "dist/*"
   ],
