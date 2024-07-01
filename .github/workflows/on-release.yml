@@ -1,6 +1,9 @@
 name: Node.js Package
 
 on:
+  push: 
+    branches: 
+      - main
   release:
     types: [created]
 
@@ -15,10 +18,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          registry-url: https://npm.pkg.github.com/
+          registry-url: 'https://registry.npmjs.org'
       - run: npm install
       - run: npx shadow-cljs release app
-      - run: npm publish
+      - run: echo "//registry.npmjs.org//:_authToken=$NODE_AUTH_TOKEN" > .npmrc
         env:
-            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ github.token }}
+      - run: npm publish
           
