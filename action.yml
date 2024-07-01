@@ -24,8 +24,12 @@ runs:
       run: mv node_modules ./dist/
     - shell: bash
       working-directory: ${{ github.action_path }}
-      run: mv routes.yaml ./dist/
+      run: mv routes.yaml ${{ github.workspace }}/dist/
     - shell: bash
       working-directory: ${{ github.action_path }}
       run: npx shadow-cljs release app
+    - shell: bash
+      working-directory: ${{ github.action_path }}
+      run: mv ./dist/actions-aws-http-node.js ${{ github.workspace }}/dist/
+    
         
