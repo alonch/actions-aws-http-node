@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-lambda-router-yaml": "^0.0.1"
+    "aws-lambda-router-yaml": "latest"
   }
 }

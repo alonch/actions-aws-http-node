@@ -23,18 +23,17 @@ jobs:
       - uses: alonch/actions-aws-backend-setup@main
         with: 
           instance: sample
-      - uses: alonch/actions-aws-http-node@main
-        id: http  
-        with:
-          artifacts: dist
+      - working-directory: "./sample"
+        run: npm install
       - uses: alonch/actions-aws-function-node@main
         id: backend
         with: 
           name: actions-aws-http-node
-          artifacts: dist
-          entrypoint-file: ${{ steps.http.outputs.entrypoint-file }}
-          entrypoint-function: ${{ steps.http.outputs.entrypoint-function }}
+          artifacts: sample/dist
+          entrypoint-file: "entry.js"
+          entrypoint-function: "handler"
           allow-public-access: true
+          node-modules: sample/node_modules
           timeout: 60
       
 

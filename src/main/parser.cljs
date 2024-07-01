@@ -37,8 +37,8 @@
           (apply [(clj->js parameters)])
           (.then (fn [result]
                    (try
-                    (resolve (js->clj result :keywordize-keys true))
-                     (catch js/Error e 
+                     (resolve (js->clj result :keywordize-keys true))
+                     (catch js/Error e
                        (reject e))))))
       (catch js/Error e
         (reject e)))))
