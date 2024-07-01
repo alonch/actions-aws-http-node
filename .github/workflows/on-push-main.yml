@@ -33,7 +33,7 @@ jobs:
           entrypoint-file: "entry.js"
           entrypoint-function: "handler"
           allow-public-access: true
-          node-modules: sample/node_modules
+          node-modules: ./sample/node_modules
           timeout: 60
       
 
