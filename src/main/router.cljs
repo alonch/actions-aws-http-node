@@ -118,8 +118,6 @@
   (let [body (get event "body")]
     (assoc event "body" (or body ""))))
 
-(def event (utils/read-json->js "./event.json"))
-
 (defn coerce-event [event on-error]
   (try
     (-> event
@@ -154,15 +152,15 @@
                           callback)))
 
 (comment
-  ((app (parser/parse-yaml-file "../routes.yaml"))
+  ((app (parser/parse-yaml-file "../sample/dist/routes.yaml"))
    {:request-method :get :uri "/"} 
    println 
    println)
-  ((app (parser/parse-yaml-file "../routes.yaml"))
+  ((app (parser/parse-yaml-file "../sample/dist/routes.yaml"))
    {:request-method :get :uri "/api-docs/index.html"} 
    println 
    println)
-  ((app (parser/parse-yaml-file "../routes.yaml"))
+  ((app (parser/parse-yaml-file "../sample/dist/routes.yaml"))
    {:request-method :get :uri "/nothing"} 
    println 
    println))
@@ -179,7 +177,7 @@
 
 (defn ^:dev/after-load start []
   (println "============= restart =================")
-  (handler "../routes.yaml"
+  (handler "../sample/dist/routes.yaml"
            (utils/read-json->js "./event-api-docs.json")
            (fn [result]
              (js/console.log result))
