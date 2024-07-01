@@ -24,8 +24,8 @@ jobs:
         with: 
           instance: sample
       - uses: alonch/actions-aws-http-node@main
+        id: http  
         with:
-          id: http
           artifacts: dist
       - uses: alonch/actions-aws-function-node@main
         id: backend
