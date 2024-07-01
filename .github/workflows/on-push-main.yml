@@ -23,20 +23,18 @@ jobs:
       - uses: alonch/actions-aws-backend-setup@main
         with: 
           instance: sample
-      - uses: actions/setup-node@v4
+      - uses: alonch/actions-aws-http-node@main
         with:
-          node-version: 20
-      - run: npm install
-      - run: mv node_modules ./dist/
-      - run: mv routes.yaml ./dist/
-      - run: npx shadow-cljs release app
+          id: http
+          artifacts: dist
       - uses: alonch/actions-aws-function-node@main
         id: backend
         with: 
           name: actions-aws-http-node
           artifacts: dist
-          entrypoint-file: entry.js
-          entrypoint-function: handler
+          entrypoint-file: ${{ steps.http.outputs.entrypoint-file }}
+          entrypoint-function: ${{ steps.http.outputs.entrypoint-function }}
           allow-public-access: true
           timeout: 60
+      
 
