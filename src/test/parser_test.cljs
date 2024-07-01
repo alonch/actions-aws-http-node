@@ -2,7 +2,7 @@
   (:require [cljs.test :refer [deftest is]]
             [parser :as subject]))
 
-(def actual (subject/parse-yaml-file "./sample/src/routes.yaml"))
+(def actual (subject/parse-yaml-file "./sample/dist/routes.yaml"))
 (def advance-route (some #(when (= (first %) "/plus/{z}") %)
                          actual))
 (def simple-route (some #(when (= (first %) "/") %)

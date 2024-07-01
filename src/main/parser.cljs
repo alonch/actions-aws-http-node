@@ -31,7 +31,8 @@
 (defn parse-handler [route]
   (fn [{:keys [parameters]} resolve reject]
     (try
-      (-> (js/require (str "./" (:entrypoint-file route)))
+      (-> (str (js/process.cwd) "/" (:entrypoint-file route))
+          (js/require)
           (js->clj)
           (get (:entrypoint-function route))
           (apply [(clj->js parameters)])
