@@ -1,8 +1,9 @@
 name: Node.js Package
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+    - 'v*.*.*'
 
 jobs:
   publish-gpr:
@@ -15,7 +16,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm version from-git
+      - run: npm version ${{ github.ref_name }} --no-git-tag-version
       - run: npm install
       - run: npx shadow-cljs release app
       - env:       
