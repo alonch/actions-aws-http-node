@@ -21,8 +21,8 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: npm install
       - run: npx shadow-cljs release app
-      - run: echo "//registry.npmjs.org//:_authToken=$NODE_AUTH_TOKEN" > .npmrc
-        env:
+      - run: echo "//registry.npmjs.org/:_auth=$NODE_AUTH_TOKEN" > .npmrc
+        env:       
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - run: npm publish
           
