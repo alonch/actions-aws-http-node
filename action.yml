@@ -72,7 +72,7 @@ runs:
       with: 
         entrypoint-file: "entry.js"
         entrypoint-function: "handler"
-        node-modules: "sample/node_modules"
+        node-modules: "${{ github.action_path }}/sample/node_modules"
         allow-public-access: "${{ inputs.allow-public-access }}"
         artifacts: "${{ inputs.artifacts }}"
         timeout: "${{ inputs.timeout }}"
