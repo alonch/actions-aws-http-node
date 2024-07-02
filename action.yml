@@ -70,7 +70,6 @@ runs:
 
     - uses: alonch/actions-aws-function-node@main
       with: 
-        name: actions-aws-http-node
         entrypoint-file: "entry.js"
         entrypoint-function: "handler"
         node-modules: "${{ github.action_path }}/sample/node_modules"
