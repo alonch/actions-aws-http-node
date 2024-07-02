@@ -15,7 +15,7 @@ Provision a AWS function with http routing and extras
 
 | name | description | required | default |
 | --- | --- | --- | --- |
-| `routes` | <p>HTTP routes and validations</p> | `true` | `""` |
+| `routes` | <p>HTTP routes and validations, <a href="#routing">docs</a></p> | `true` | `""` |
 | `action` | <p>Desire outcome: apply, plan or destroy</p> | `false` | `apply` |
 | `name` | <p>Function name</p> | `true` | `""` |
 | `arm` | <p>Run in ARM compute</p> | `false` | `true` |
@@ -204,7 +204,7 @@ For example, when sending body y as string, this would be the response
 
 ### routes.parameters.path
 
-Array of parameters included as part of [routes.path](#routes.path), 
+Array of parameters included as part of [routes.path](#routespath), 
 
 for example: 
 
