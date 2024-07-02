@@ -28,7 +28,7 @@ jobs:
           name: actions-aws-http-node
           artifacts: sample/dist
           timeout: 60
-          memory: 256
+          memory: 512
           allow-public-access: true
           routes: |
             - entrypoint-file: index
@@ -42,14 +42,14 @@ jobs:
               method: post
               parameters:
                 path:
-                  - name: z
-                    type: number
+                - name: z
+                  type: number
                 query:
-                  - name: x
-                    type: number
+                - name: x
+                  type: number
                 body: 
-                  - name: y
-                    type: number
+                - name: y
+                  type: number
               responses: 
                 - status-code: 200
                   body:
