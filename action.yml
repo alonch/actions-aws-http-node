@@ -27,7 +27,7 @@ inputs:
     description: List of environment variables in YML format
     required: false
     default: |
-      CREATE_BY: alonch/actions-aws-function-node
+      CREATE_BY: alonch/actions-aws-http-node
   permissions:
     description: "List of permissions following Github standard of service: read or write. In YML format"
     default: ""
