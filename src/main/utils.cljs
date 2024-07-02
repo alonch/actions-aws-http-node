@@ -1,6 +1,7 @@
 (ns utils
   (:require ["fs" :as fs]
-            ["yaml" :as yaml]))
+            ["yaml" :as yaml]
+            [clojure.string :as str]))
 
 (defn str-json->clj [data]
   (-> data
@@ -34,3 +35,15 @@
       (js->clj :keywordize-keys true)))
 
 (comment (read-yaml->js "../routes.yaml") )
+
+(defn get-content-type [filename]
+  (let [extension (last (str/split filename #"\."))]
+    (case extension
+      "txt" "text/plain"
+      "html" "text/html"
+      "css" "text/css"
+      "js" "application/javascript"
+      "json" "application/json"
+      "png" "image/png"
+      "jpg" "image/jpeg"
+      "application/octet-stream")))

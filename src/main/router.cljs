@@ -1,62 +1,26 @@
 (ns router
   (:require [reitit.ring :as ring]
-          ;;  [reitit.openapi :as openapi]
             [reitit.ring.malli]
             [malli.core :as m]
             [reitit.swagger :as swagger]
             [reitit.ring.coercion :as coercion]
-            [reitit.dev.pretty :as pretty]
             [reitit.coercion.malli :as rcm]
-            [reitit.coercion :as rc]
-            [reitit.ring.spec :as rrs]
             [camel-snake-kebab.core :as csk]
-               ;       [spec-tools.spell :as spell]
-            [malli.util :as mu]
             [malli.error :as me]
             ["swagger-ui-dist" :as swagger-ui]
             [clojure.string :as str]
             [malli.transform :as mt]
-            [reitit.spec :as rs]
             [utils]
             [parser]))
 
-(def app-header
-  (ring/ring-handler
-   (ring/router ["/test"
-                 {:post {:handler identity
-                         :parameters {:header {:cookie {:token :int}}}}}]
-                {:data {:coercion rcm/coercion
-                        :middleware [coercion/coerce-exceptions-middleware
-                                     coercion/coerce-request-middleware
-                                     coercion/coerce-response-middleware]}})
-   (constantly {:status 404, :body ""})))
-(comment
-
-  (app-header {:uri "/test"
-               :request-method :post
-               :headers  {:cookie {:token "1"}}}))
-
-(defn get-content-type [filename]
-  (let [extension (last (str/split filename #"\."))]
-    (case extension
-      "txt" "text/plain"
-      "html" "text/html"
-      "css" "text/css"
-      "js" "application/javascript"
-      "json" "application/json"
-      "png" "image/png"
-      "jpg" "image/jpeg"
-      "application/octet-stream")))
-(comment
-  (get-content-type "swagger-initializer.js"))
 (def swagger-path (.absolutePath swagger-ui))
-(defn remove-petstore-url [string-buffer]
-  (str/replace string-buffer "https://petstore.swagger.io/v2" ""))
 
-(comment
-  (remove-petstore-url ""))
+(defn fix-swagger-static-url [path content]
+  (if (= path "swagger-initializer.js") 
+    (str/replace content "https://petstore.swagger.io/v2" "") 
+    content))
 
-(defn app [details]
+(defn app [routes]
   (ring/ring-handler
    (ring/router [["" {:no-doc true}
                   ["/swagger.json"
@@ -64,21 +28,19 @@
                   ["/api-docs/{*path}"
                    {:get {:handler
                           (fn [{{:keys [path]} :path-params} resolve _reject]
-                            (let [file (str swagger-path "/" path)
+                            (let [headers {:content-type (utils/get-content-type path)}
+                                  file (str swagger-path "/" path)
                                   content (utils/read-static-content file)
-                                  parsed-content (cond
-                                                   (= path "swagger-initializer.js") (remove-petstore-url content)
-                                                   :else content)]
+                                  parsed-content (fix-swagger-static-url path content)]
                               (resolve {:status 200
                                         :body parsed-content
-                                        :headers {:content-type (get-content-type path)}})))}}]]
-                 details]
+                                        :headers headers})))}}]]
+                 routes]
                 {:data {:coercion rcm/coercion
                         :middleware [coercion/coerce-exceptions-middleware
                                      coercion/coerce-request-middleware
                                      coercion/coerce-response-middleware]}})
    (ring/create-default-handler)))
-
 
 ;; (comment
 ;;   (try
@@ -114,7 +76,10 @@
                               [:path :string]]]]]])
 
 
-(defn inject-default-body [event]
+
+(defn inject-default-body 
+  "TODO: This is needed for GET requests that don't include body, use multi-event types instead"
+  [event]
   (let [body (get event "body")]
     (assoc event "body" (or body ""))))
 
@@ -151,37 +116,24 @@
                           callback
                           callback)))
 
-(comment
-  ((app (parser/parse-yaml-file "../sample/dist/routes.yaml"))
-   {:request-method :get :uri "/"} 
-   println 
-   println)
-  ((app (parser/parse-yaml-file "../sample/dist/routes.yaml"))
-   {:request-method :get :uri "/api-docs/index.html"} 
-   println 
-   println)
-  ((app (parser/parse-yaml-file "../sample/dist/routes.yaml"))
-   {:request-method :get :uri "/nothing"} 
-   println 
-   println))
-
-(comment
-  (-> (js/require "./plus.js")
-      (js->clj)
-      (get "handler")
-      (apply "hola")
-      (.then js/console.log)))
-
-;; (defn ^:dev/before-load stop [])
-;;   ;; (println "============= stop =================")
-
 (defn ^:dev/after-load start []
   (println "============= restart =================")
-  (handler "../sample/dist/routes.yaml"
-           (utils/read-json->js "./event-api-docs.json")
-           (fn [result]
-             (js/console.log result))
-           println)
-  ;; (require '[ :as plus] :reload)
+  ;; (handler "../src/test/routes.yaml"
+  ;;          (utils/read-json->js "./event-api-docs.json")
+  ;;          (fn [result]
+  ;;            (js/console.log result))
+  ;;          println)
+  ((app (parser/parse-yaml-file "../src/test/routes.yaml"))
+   {:request-method :get :uri "/"}
+   println
+   println)
+  ((app (parser/parse-yaml-file "../src/test/routes.yaml"))
+   {:request-method :get :uri "/api-docs/index.html"}
+   println
+   println)
+  ((app (parser/parse-yaml-file "../src/test/routes.yaml"))
+   {:request-method :get :uri "/nothing"}
+   println
+   println)
   )
   
