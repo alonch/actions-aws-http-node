@@ -27,12 +27,15 @@ jobs:
         with:
           name: actions-aws-http-node
           artifacts: sample/dist
+          timeout: 60
+          memory: 256
+          allow-public-access: true
           routes: |
             - entrypoint-file: index
               entrypoint-function: handler
               path: "/"
               method: get
-              
+
             - entrypoint-file: plus
               entrypoint-function: handler
               path: "/plus/{z}"
@@ -52,8 +55,7 @@ jobs:
                   body:
                   - name: total
                     type: number
-          allow-public-access: true
-          timeout: 60
+          
 
       
 
