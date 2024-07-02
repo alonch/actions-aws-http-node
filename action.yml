@@ -64,8 +64,8 @@ runs:
       working-directory: "${{ github.workspace	}}/${{ inputs.artifacts }}"
       run: |
         cat <<EOF > generated_routes.yaml
-          routes:
-          ${{ inputs.routes }}
+        routes:
+        ${{ inputs.routes }}
         EOF
         cat generated_routes.yaml
     - uses: alonch/actions-aws-function-node@main
