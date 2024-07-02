@@ -45,7 +45,7 @@ runs:
       run: npm install
     - name: inject entry handler
       shell: bash
-      working-directory: ${{ github.workspace	}}/${{ inputs.artifacts }}
+      working-directory: "${{ github.workspace	}}/${{ inputs.artifacts }}"
       run: |
         cat <<-EOF > entry.js
         const router = require("aws-lambda-router-yaml")
@@ -60,7 +60,7 @@ runs:
         EOF
     - name: inject routes
       shell: bash
-      working-directory: ${{ github.workspace	}}/${{ inputs.artifacts }}
+      working-directory: "${{ github.workspace	}}/${{ inputs.artifacts }}"
       run: |
         cat <<-EOF > generated_routes.yaml
           routes:
