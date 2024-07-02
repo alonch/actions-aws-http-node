@@ -1,0 +1,84 @@
+name: 'Actions AWS Http backend for Node'
+description: 'Provision a AWS function with http routing'
+inputs:
+  routes: 
+    description: "HTTP routes and validations"
+  action: 
+    description: "Desire outcome: apply, plan or destroy"
+    required: false
+    default: "apply"
+  name:
+    description: Function name
+    required: true
+  arm:
+    description: Run in ARM compute
+    required: false
+    default: "false"
+  node-version:
+    description: "NodeJS version, Supported versions: 16, 18 and 20"
+    required: false
+    default: "20"
+  memory:
+    description: 128 (in MB) to 10,240 (in MB)
+    required: false
+    default: "128"
+  env: 
+    description: List of environment variables in YML format
+    required: false
+    default: |
+      CREATE_BY: alonch/actions-aws-function-node
+  permissions:
+    description: "List of permissions following Github standard of service: read or write. In YML format"
+    default: ""
+  artifacts:
+    description: This folder will be zip and deploy to Lambda
+  timeout: 
+    description: Maximum time in seconds before aborting the execution 
+    default: "3"
+  allow-public-access:
+    description: "Generate a public URL. WARNING: ANYONE ON THE INTERNET CAN RUN THIS FUNCTION"
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      working-directory: "${{ github.action_path }}/sample"
+      run: npm install
+    - name: inject entry handler
+      shell: bash
+      working-directory: ${{ github.workspace	}}/${{ inputs.artifacts }}
+      run: |
+        cat <<-EOF > entry.js
+        const router = require("aws-lambda-router-yaml")
+        exports.handler = async function(event, context) {
+            console.log(JSON.stringify(event))
+            const response = await new Promise((resolve, reject) => {
+                router.handler("./routes.yaml", event, resolve, reject)
+            });
+            console.log(JSON.stringify(response))
+            return response
+        };
+        EOF
+    - name: inject routes
+      working-directory: ${{ github.workspace	}}/${{ inputs.artifacts }}
+      run: |
+        cat <<-EOF > routes.yaml
+        routes:
+        ${{ inputs.routes }}
+        EOF
+    - uses: alonch/actions-aws-function-node@main
+        id: backend
+        with: 
+          name: actions-aws-http-node
+          entrypoint-file: "entry.js"
+          entrypoint-function: "handler"
+          node-modules: "${{ github.action_path }}/sample/node_modules"
+          allow-public-access: ${{ inputs.allow-public-access }}
+          artifacts: ${{ github.workspace	}}/${{ inputs.artifacts }}
+          timeout: ${{ inputs.timeout }}
+          action: ${{ inputs.action }}
+          name: ${{ inputs.name }}
+          arm: ${{ inputs.arm }}
+          node-version: ${{ inputs.node-version }}
+          memory: ${{ inputs.memory }}
+          env: ${{ inputs.env }}
+          permissions: ${{ inputs.permissions }}
