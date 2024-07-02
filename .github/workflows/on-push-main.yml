@@ -28,6 +28,7 @@ jobs:
           name: actions-aws-http-node
           artifacts: sample/dist
           timeout: 60
+          arm: false
           memory: 256
           allow-public-access: true
           routes: |
