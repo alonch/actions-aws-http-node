@@ -3,6 +3,7 @@ description: 'Provision a AWS function with http routing'
 inputs:
   routes: 
     description: "HTTP routes and validations"
+    required: true
   action: 
     description: "Desire outcome: apply, plan or destroy"
     required: false
@@ -73,13 +74,13 @@ runs:
           entrypoint-file: "entry.js"
           entrypoint-function: "handler"
           node-modules: "${{ github.action_path }}/sample/node_modules"
-          allow-public-access: ${{ inputs.allow-public-access }}
-          artifacts: ${{ github.workspace	}}/${{ inputs.artifacts }}
-          timeout: ${{ inputs.timeout }}
-          action: ${{ inputs.action }}
-          name: ${{ inputs.name }}
-          arm: ${{ inputs.arm }}
-          node-version: ${{ inputs.node-version }}
-          memory: ${{ inputs.memory }}
-          env: ${{ inputs.env }}
-          permissions: ${{ inputs.permissions }}
+          allow-public-access: "${{ inputs.allow-public-access }}"
+          artifacts: "${{ github.workspace	}}/${{ inputs.artifacts }}"
+          timeout: "${{ inputs.timeout }}"
+          action: "${{ inputs.action }}"
+          name: "${{ inputs.name }}"
+          arm: "${{ inputs.arm }}"
+          node-version: "${{ inputs.node-version }}"
+          memory: "${{ inputs.memory }}"
+          env: "${{ inputs.env }}"
+          permissions: "${{ inputs.permissions }}"
