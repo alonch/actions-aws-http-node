@@ -44,43 +44,43 @@ runs:
     - shell: bash
       working-directory: "${{ github.action_path }}/sample"
       run: npm install
-    # - name: inject entry handler
-    #   shell: bash
-    #   working-directory: "${{ github.workspace	}}/${{ inputs.artifacts }}"
-    #   run: |
-    #     cat <<-EOF > entry.js
-    #     const router = require("aws-lambda-router-yaml")
-    #     exports.handler = async function(event, context) {
-    #         console.log(JSON.stringify(event))
-    #         const response = await new Promise((resolve, reject) => {
-    #             router.handler("./generated_routes.yaml", event, resolve, reject)
-    #         });
-    #         console.log(JSON.stringify(response))
-    #         return response
-    #     };
-    #     EOF
-    # - name: inject routes
-    #   shell: bash
-    #   working-directory: "${{ github.workspace	}}/${{ inputs.artifacts }}"
-    #   run: |
-    #     cat <<-EOF > generated_routes.yaml
-    #       routes:
-    #       ${{ inputs.routes }}
-    #     EOF
+    - name: inject entry handler
+      shell: bash
+      working-directory: "${{ github.workspace	}}/${{ inputs.artifacts }}"
+      run: |
+        cat <<-EOF > entry.js
+        const router = require("aws-lambda-router-yaml")
+        exports.handler = async function(event, context) {
+            console.log(JSON.stringify(event))
+            const response = await new Promise((resolve, reject) => {
+                router.handler("./generated_routes.yaml", event, resolve, reject)
+            });
+            console.log(JSON.stringify(response))
+            return response
+        };
+        EOF
+    - name: inject routes
+      shell: bash
+      working-directory: "${{ github.workspace	}}/${{ inputs.artifacts }}"
+      run: |
+        cat <<-EOF > generated_routes.yaml
+          routes:
+          ${{ inputs.routes }}
+        EOF
+
     - uses: alonch/actions-aws-function-node@main
-        id: backend
-        with: 
-          name: actions-aws-http-node
-          entrypoint-file: "entry.js"
-          entrypoint-function: "handler"
-          node-modules: "${{ github.action_path }}/sample/node_modules"
-          allow-public-access: "${{ inputs.allow-public-access }}"
-          artifacts: "${{ github.workspace	}}/${{ inputs.artifacts }}"
-          timeout: "${{ inputs.timeout }}"
-          action: "${{ inputs.action }}"
-          name: "${{ inputs.name }}"
-          arm: "${{ inputs.arm }}"
-          node-version: "${{ inputs.node-version }}"
-          memory: "${{ inputs.memory }}"
-          env: "${{ inputs.env }}"
-          permissions: "${{ inputs.permissions }}"
+      with: 
+        name: actions-aws-http-node
+        entrypoint-file: "entry.js"
+        entrypoint-function: "handler"
+        node-modules: "${{ github.action_path }}/sample/node_modules"
+        allow-public-access: "${{ inputs.allow-public-access }}"
+        artifacts: "${{ inputs.artifacts }}"
+        timeout: "${{ inputs.timeout }}"
+        action: "${{ inputs.action }}"
+        name: "${{ inputs.name }}"
+        arm: "${{ inputs.arm }}"
+        node-version: "${{ inputs.node-version }}"
+        memory: "${{ inputs.memory }}"
+        env: "${{ inputs.env }}"
+        permissions: "${{ inputs.permissions }}"
