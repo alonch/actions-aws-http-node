@@ -67,7 +67,6 @@ runs:
         routes:
         ${{ inputs.routes }}
         EOF
-        cat generated_routes.yaml
     - uses: alonch/actions-aws-function-node@main
       with: 
         entrypoint-file: "entry.js"
