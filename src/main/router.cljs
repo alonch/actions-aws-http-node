@@ -42,20 +42,6 @@
                                      coercion/coerce-response-middleware]}})
    (ring/create-default-handler)))
 
-;; (comment
-;;   (try
-;;     (app)
-;;     (catch js/Error e
-;;       (-> e ex-data :data :explain me/humanize))))
-
-(def strict-json-transformer
-  (mt/transformer
-   mt/default-value-transformer
-   mt/string-transformer
-   (mt/key-transformer {:decode csk/->kebab-case-keyword})
-   mt/strip-extra-keys-transformer
-   mt/json-transformer))
-
 (defn cookies-str->clj
   [cookie-str]
   (->> (str/split cookie-str #"; ")
@@ -76,6 +62,13 @@
                               [:path :string]]]]]])
 
 
+(def transformers
+  (mt/transformer
+   mt/default-value-transformer
+   mt/string-transformer
+   (mt/key-transformer {:decode csk/->kebab-case-keyword})
+   mt/strip-extra-keys-transformer
+   mt/json-transformer))
 
 (defn inject-default-body 
   "TODO: This is needed for GET requests that don't include body, use multi-event types instead"
@@ -88,7 +81,7 @@
     (-> event
         (js->clj)
         (inject-default-body)
-        (#(m/coerce Event % strict-json-transformer)))
+        (#(m/coerce Event % transformers)))
     (catch js/Error e
       (on-error e)
       (js/console.error e)
