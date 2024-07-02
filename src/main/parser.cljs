@@ -1,7 +1,5 @@
 (ns parser
-  (:require [clojure.core.async :refer [chan put! take!]]
-            [promesa.core :as p]
-            [utils]))
+  (:require [utils]))
 
 (defn type->schema [type]
   (cond
@@ -24,9 +22,10 @@
                         (:parameters)
                         (parameter-key)
                         (map parse-schema))]
-
     (when (not-empty attributes)
-      (->> attributes (concat [:map]) (into [])))))
+      (->> attributes
+           (concat [:map])
+           (into [])))))
 
 (defn parse-handler [route]
   (fn [{:keys [parameters]} resolve reject]
@@ -60,10 +59,9 @@
                             (not-empty body-schema) (assoc :body body-schema))}}]))
 
 (defn parse [content]
-  (let [raw-routes (:routes content)]
-    (->> raw-routes
-         (map parse-route)
-         (into []))))
+  (->> (:routes content)
+       (map parse-route)
+       (into [])))
 
 (defn parse-json-file [path]
   (parse (utils/read-json->clj path)))
@@ -71,16 +69,8 @@
 (defn parse-yaml-file [path]
   (parse (utils/read-yaml->clj path)))
 
-
-
-
-(defn ^:dev/before-load stop [])
-  ;; (println "============= stop =================")
-
 (defn ^:dev/after-load start []
   (println "============= restart =================")
-  (-> (parse-yaml-file "../routes.yaml")
-      (println))
-  ;; (require '[ :as plus] :reload)
-  )
+  (-> (parse-yaml-file "../src/test/routes.yaml")
+      (println)))
 
