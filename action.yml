@@ -59,6 +59,7 @@ runs:
         };
         EOF
     - name: inject routes
+      shell: bash
       working-directory: ${{ github.workspace	}}/${{ inputs.artifacts }}
       run: |
         cat <<-EOF > routes.yaml
