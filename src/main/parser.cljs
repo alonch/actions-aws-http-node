@@ -1,5 +1,6 @@
 (ns parser
-  (:require [utils]))
+  (:require [utils]
+            [clojure.string :as str]))
 
 (defn type->schema [type]
   (cond
@@ -45,7 +46,10 @@
 
 (defn parse-route [route]
   (let [path (:path route)
-        method (-> route (:method) (keyword))
+        method (-> route 
+                   (:method)  
+                   (str/lower-case)
+                   (keyword))
         responses (map parse-response (:responses route))
         query-schema (parse-parameter-schema route :query)
         path-schema (parse-parameter-schema route :path)

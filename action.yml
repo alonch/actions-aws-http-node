@@ -1,8 +1,11 @@
 name: 'Actions AWS Http backend for Node'
-description: 'Provision a AWS function with http routing'
+description: |
+  Provision a AWS function with http routing and extras 
+  * API docs with [Swagger](https://swagger.io/)
+  * Request and Response Schema validation with [malli](https://github.com/metosin/malli)
 inputs:
   routes: 
-    description: "HTTP routes and validations"
+    description: "HTTP routes and validations, [docs](#routing)"
     required: true
   action: 
     description: "Desire outcome: apply, plan or destroy"

@@ -7,7 +7,7 @@ routes:
   - entrypoint-file: plus
     entrypoint-function: handler
     path: "/plus/{z}"
-    method: post
+    method: POST
     parameters:
       path:
         - name: z
