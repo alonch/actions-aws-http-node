@@ -88,5 +88,6 @@ runs:
         permissions: "${{ inputs.permissions }}"
     - env:
         URL: ${{ steps.backend.outputs.url }}
-      run: echo "URL: $URL" >> $GITHUB_STEP_SUMMARY
+      run: | 
+        echo "API docs: $URL/api-docs/index.html" >> $GITHUB_STEP_SUMMARY
       shell: bash
