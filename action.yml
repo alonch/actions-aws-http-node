@@ -89,5 +89,5 @@ runs:
     - env:
         URL: ${{ steps.backend.outputs.url }}
       run: | 
-        echo "API docs: $URL/api-docs/index.html" >> $GITHUB_STEP_SUMMARY
+        echo "API docs: $URLapi-docs/index.html" >> $GITHUB_STEP_SUMMARY
       shell: bash
