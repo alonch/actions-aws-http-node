@@ -71,6 +71,7 @@ runs:
         ${{ inputs.routes }}
         EOF
     - uses: alonch/actions-aws-function-node@main
+      id: backend
       with: 
         entrypoint-file: "entry.js"
         entrypoint-function: "handler"
@@ -85,3 +86,7 @@ runs:
         memory: "${{ inputs.memory }}"
         env: "${{ inputs.env }}"
         permissions: "${{ inputs.permissions }}"
+    - env:
+        URL: ${{ steps.backend.outputs.url }}
+      run: echo "URL: $URL" >> $GITHUB_STEP_SUMMARY
+      shell: bash
