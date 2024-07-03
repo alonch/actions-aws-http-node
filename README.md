@@ -185,19 +185,22 @@ Parameters are validated and when requests parameters are invalid, reponse with 
 For example, when sending body y as string, this would be the response
 ```
 {
-  "in": [
-    "request",
-    "body-params"
-  ],
-  "coercion": "malli",
-  "type": "request-coercion",
-  "value": {
-    "y": "4"
-  },
-  "humanized": {
-    "y": [
-      "should be an integer"
-    ]
+  "statusCode":400,
+  "body": {
+    "in": [
+      "request",
+      "body-params"
+    ],
+    "coercion": "malli",
+    "type": "request-coercion",
+    "value": {
+      "y": "4"
+    },
+    "humanized": {
+      "y": [
+        "should be an integer"
+      ]
+    }
   }
 }
 ```
@@ -331,8 +334,8 @@ Response is validated by `status-code`, this means that if `firstName` field is 
 
 ```
 {
-  statusCode: 500,
-  body: {
+  "statusCode": 500,
+  "body": {
     "in": [
       "response",
       "body"
