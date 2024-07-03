@@ -1,7 +1,7 @@
 <!-- action-docs-header source="action.yml" -->
 
 <!-- action-docs-header source="action.yml" -->
-![Demo Status](https://github.com/alonch/actions-aws-http-node/actions/workflows/on-push.yml/badge.svg)
+![Demo Status](https://github.com/alonch/actions-aws-http-node/actions/workflows/on-push-main.yml/badge.svg)
 <!-- action-docs-description source="action.yml" -->
 ## Description
 
