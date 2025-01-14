@@ -41,6 +41,12 @@ inputs:
     default: "3"
   allow-public-access:
     description: "Generate a public URL. WARNING: ANYONE ON THE INTERNET CAN RUN THIS FUNCTION"
+
+outputs: 
+  url:
+    description: "URL to invoke the function"
+    value: ${{ steps.backend.outputs.url }}
+    
 runs:
   using: "composite"
   steps:
